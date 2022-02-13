@@ -6,6 +6,7 @@ from imagedataset import ImageDataset, ImageDataLoader
 from imagenet import ImageNet
 import numpy as np
 import os
+import sys
 
 def train_model(net:ImageNet, dataloader_train:ImageDataLoader, dataloader_test:ImageDataLoader, epoch_num):
     optimizer = optim.Adam(net.parameters(), lr=0.001)
@@ -55,21 +56,27 @@ def train_model(net:ImageNet, dataloader_train:ImageDataLoader, dataloader_test:
             print("epoch_num={}, train={}, loss={:.4f}, acc={:.4f}".format(epoch, is_train, epoch_loss, epoch_acc))
 
 if __name__=="__main__":
+    datapath=""
+    if len(sys.argv) == 2:
+        datapath=sys.argv[1]
+    else:
+        datapath=r"C:\work\asami\code\pytorch_image1\data\cifar10\cifar10_data"
+           
     dataset_train = ImageDataset(True, 32)
-    dataset_train.load_numpys(r"D:\git\pytorch_test\cifar10\cifar10_data\train")
+    dataset_train.load_numpys(os.path.join(datapath, "train"))
     dataloader_train = ImageDataLoader(dataset_train, 50)
     
     dataset_test = ImageDataset(False, 32)
-    dataset_test.load_numpys(r"D:\git\pytorch_test\cifar10\cifar10_data\test")
+    dataset_test.load_numpys(os.path.join(datapath, "test"))
     dataloader_test = ImageDataLoader(dataset_test, 50)
         
     net = ImageNet(3, 32, 32, 10)
     
-    data_path=r"D:\git\pytorch_test\testdata.dat"
-    if os.path.isfile(data_path):
-        net.load_weight(data_path)
+    weight_path=os.path.join(datapath, "testdata.dat")
+    if os.path.isfile(weight_path):
+        net.load_weight(weight_path)
         
     train_model(net, dataloader_train, dataloader_test, 2)
     
-    net.save_weight(data_path)
+    net.save_weight(weight_path)
     
